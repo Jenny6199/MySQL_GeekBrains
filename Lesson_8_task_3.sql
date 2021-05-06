@@ -69,3 +69,5 @@ SELECT
 	GROUP BY users.id
 	ORDER BY total
 	LIMIT 10;
+
+-- end
