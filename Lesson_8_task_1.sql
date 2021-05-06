@@ -18,4 +18,3 @@ SELECT
 	LEFT JOIN likes
 		ON likes.user_id = users.id
 	GROUP BY profiles.gender;
-
