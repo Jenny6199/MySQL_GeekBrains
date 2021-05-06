@@ -71,3 +71,5 @@ SELECT
 SELECT likes.id from likes;
 SELECT * fROM media;
 SELECT * FROM likes;
+
+		       
