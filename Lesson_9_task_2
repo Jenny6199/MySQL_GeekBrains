@@ -1,0 +1,26 @@
+-- Домашнее задание к уроку № 9 MySQL.
+-- Студент: Максим Сапунов Jenny6199@yandex.ru 08.05.2021
+
+-- Задача №2 Создайте представление, которые выводит название name товарной позиции
+-- из таблицы products и соответствующее название каталога.
+
+-- Исследую таблицы.
+USE shop;
+DESC products;
+DESC catalogs;
+
+-- Создаю представление используя полученные ранее навыки по объединению таблиц и
+-- оформлению запросов.
+CREATE VIEW list_of_technic AS
+	SELECT 
+		ctl.name AS Category,
+		prd.name AS Meaning  
+			FROM products AS prd
+				INNER JOIN catalogs AS ctl
+			ON prd.catalog_id = ctl.id;
+		
+-- Проверяю возможность использования представления.
+SELECT * FROM list_of_technic;
+
+-- Удаление представления.
+DROP VIEW list_of_technic;
