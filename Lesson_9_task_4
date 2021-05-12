@@ -1,0 +1,51 @@
+-- Домашнее задание к уроку №9 Транзации, переменные, представления.
+-- Студент: Максим Сапунов Jenny6199@yandex.ru 11.05.2021
+
+-- Задача № 4. (по желанию) Пусть имеется любая таблица с календарным полем created_at. 
+-- Создайте запрос, который удаляет устаревшие записи из таблицы, оставляя только 5 самых свежих записей.
+
+USE lesson_9;
+DROP TABLE IF EXISTS notebook;
+CREATE TABLE IF NOT EXISTS notebook (
+	id SERIAL PRIMARY KEY,
+	note VARCHAR(255),
+	created_at DATE NOT NULL
+);
+
+INSERT INTO notebook
+	VALUES
+		(NULL, 'запись №01', '2021-05-01'),
+		(NULL, 'запись №02', '2021-05-02'),
+		(NULL, 'запись №03', '2021-05-03'),
+		(NULL, 'запись №04', '2021-05-04'),
+		(NULL, 'запись №05', '2021-05-05'),
+		(NULL, 'запись №06', '2021-05-06'),
+		(NULL, 'запись №07', '2021-05-07'),
+		(NULL, 'запись №08', '2021-05-08'),
+		(NULL, 'запись №09', '2021-05-09'),
+		(NULL, 'запись №10', '2021-05-10');
+	
+-- Первое решение WRONG
+DELETE notebook 
+	FROM notebook
+		JOIN
+		(SELECT created_at as top FROM notebook ORDER BY created_at LIMIT 5) AS top_5
+		ON notebook.created_at = top;
+
+-- Тестирую работу скрипта, обнаружил ошибку - предыдущий вариант будет работать только на
+-- маленькой выборке, при большем значении данных будет удалять лишь 5 строк с наименьшим значением
+-- в то время как на вывод будут направлены все остальные. 
+	
+SELECT * FROM notebook ORDER BY created_at DESC;
+
+-- Исправил пользуясь материалами урока.
+DELETE notebook
+	FROM notebook
+		JOIN
+		(SELECT created_at
+		 	FROM notebook
+		 	ORDER BY created_at DESC 
+		 	LIMIT 5, 1) AS deleted_strings
+		 ON notebook.created_at <= deleted_strings.created_at;
+
+SELECT * FROM notebook ORDER BY created_at DESC;
