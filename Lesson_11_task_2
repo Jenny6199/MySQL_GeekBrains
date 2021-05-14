@@ -1,0 +1,38 @@
+-- Домашнее задание к уроку № 11 MySQL Оптимизация запросов.
+-- Студент Максим Сапунов Jenny6199@yandex.ru 14.05.2021
+
+-- Задача № 2. Создайте SQL-запрос, который помещает в таблицу users миллион записей.
+
+USE lesson_11;
+DROP TABLE IF EXISTS get_billion;
+
+-- Создаю таблицу
+CREATE TABLE IF NOT EXISTS get_billion (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	meaning INT NOT NULL);
+
+-- Назначаю переменную
+SET @i = 0;
+
+-- Заполнять таблицу планирую с помощью цикла в теле процедуры.
+DROP PROCEDURE IF EXISTS insert_billion;
+DELIMITER //
+
+CREATE PROCEDURE insert_billion(INOUT i INT)
+	BEGIN
+		cicle_1: WHILE i < 1000 DO 
+		-- Боюсь не дождусь выполнения если будет 1М :)
+		-- 1000 выполнялась 170 сек.
+			SET i = i + 1; 		
+			INSERT INTO get_billion (meaning)
+			VALUES (i);
+		END WHILE;
+	END//
+	
+DELIMITER ;
+
+-- Вызываю процедуру
+CALL insert_billion(@i);
+
+-- Проверяю значение переменной и количество записей.
+SELECT @i, COUNT(*) FROM get_billion;
