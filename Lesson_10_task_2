@@ -1,0 +1,101 @@
+-- Домашнее задание к уроку № 10 MySQL. Оконные функции
+-- Студент Максим Сапунов Jenny6199@yandex.ru 13.05.2021 г.
+
+USE vk;
+
+DESC communities_users;
+DESC communities;
+DESC users;
+DESC profiles;
+
+SELECT DISTINCT
+        -- ROW_NUMBER() OVER w_cmnt AS 'ROW_NUMBER',
+        -- RANK() OVER() AS 'RANK',
+        -- DENSE_RANK() OVER()
+        -- LAG() OVER()
+        -- LEAD() OVER()
+        -- FIRST_VALUE(c.updated_at) OVER(PARTITION BY cu.community_id) AS 'FV'>
+        -- LAST_VALUE(c.updated_at) OVER(PARTITION BY cu.community_id) AS 'LV',
+        cu.community_id 
+        	AS 'id группы',
+        c.name 
+        	AS 'Имя группы',
+        FIRST_VALUE(CONCAT(us.last_name, ' ', us.first_name)) 
+        	OVER (w_cmnt ORDER BY p.birthday) 
+        	AS 'Самый старший пользователь группы',
+        MIN(p.birthday) OVER w_cmnt 
+        	AS 'День рождения самого старшего пользователя',	
+        COUNT(community_id) OVER(PARTITION BY community_id) 
+        	AS 'Количество пользователей в группе',
+        FIRST_VALUE(CONCAT(us.last_name, ' ', us.first_name)) 
+        	OVER (w_cmnt ORDER BY p.birthday DESC) 
+        	AS 'Самый молодой пользователь группы',	
+        MAX(p.birthday) OVER(PARTITION BY community_id) AS 'День рождения самого молодого пользователя пользователя',
+        -- AVG(YEAR(NOW())-YEAR(p.birthday)) OVER(PARTITION BY community_id) AS 'среднее значение возраст'
+        COUNT(cu.user_id) OVER w_cmnt / (SELECT COUNT(last_name) FROM users)*100
+        	AS 'Среднее количество пользователей в группе',
+        SELECT COUNT(last_name) FROM users 
+        	AS 'Всего пользователей'
+FROM communities_users AS cu
+LEFT JOIN users AS us
+        ON us.id = cu.user_id
+LEFT JOIN communities AS c
+        ON cu.community_id = c.id
+LEFT JOIN profiles AS p
+        ON p.user_id = us.id
+WINDOW w_cmnt AS (PARTITION BY cu.community_id);
+
+-- Анализ ошибок
+-- 1. Обращать внимание на объединение таблиц, что с чем объединяется.
+-- 2. Возможно комбинировать вложенные запросы с оконными функциями.
+-- 3. По условию задачи может потребоваться выполнение сортировки в окне.
+-- 4. В случае необходимости шаблонов WINDOW может быть несколько.
+
+
+-- РЕАЛИЗАЦИЯ ПРЕДЛОЖЕННАЯ НА УРОКЕ.
+
+-- Вариант с вложенными запросами в части SELECT
+SELECT DISTINCT 
+  communities.name AS group_name,
+  COUNT(communities_users.user_id) OVER() 
+    / (SELECT COUNT(*) FROM communities) AS avg_users_in_groups,
+  FIRST_VALUE(CONCAT_WS(" ", users.first_name, users.last_name)) 
+    OVER (w_community ORDER BY profiles.birthday DESC) AS youngest,
+  FIRST_VALUE(CONCAT_WS(" ", users.first_name, users.last_name)) 
+    OVER (w_community ORDER BY profiles.birthday ASC) AS oldest,
+  COUNT(communities_users.user_id) OVER w_community AS users_in_group,
+  (SELECT COUNT(*) FROM users) AS users_total,
+  COUNT(communities_users.user_id) OVER w_community / (SELECT COUNT(*) FROM users) *100 AS '%%'
+    FROM communities
+      LEFT JOIN communities_users 
+        ON communities_users.community_id = communities.id
+      LEFT JOIN users 
+        ON communities_users.user_id = users.id
+      LEFT JOIN profiles 
+        ON profiles.user_id = users.id
+      WINDOW w_community AS (PARTITION BY communities.id);    
+                              
+             
+-- Вариант с вложенными запросами в объединении JOIN
+SELECT DISTINCT 
+  communities.name AS group_name,
+  COUNT(communities_users.user_id) OVER() / total_communities AS avg_users_in_groups,
+  FIRST_VALUE(CONCAT_WS(" ", users.first_name, users.last_name)) 
+    OVER (w_community ORDER BY profiles.birthday DESC) AS youngest,
+  FIRST_VALUE(CONCAT_WS(" ", users.first_name, users.last_name)) 
+    OVER (w_community ORDER BY profiles.birthday ASC) AS oldest,
+  COUNT(communities_users.user_id) OVER w_community AS users_in_group,
+  total_users,
+  COUNT(communities_users.user_id) OVER w_community / (SELECT total_communities * 100 AS '%%'
+    FROM 
+        (SELECT COUNT(*) AS total_users FROM users) AS tu
+  	  CROSS JOIN 
+  	    (SELECT COUNT(*) AS total_communities FROM communities) AS tc
+  	  CROSS JOIN communities
+      LEFT JOIN communities_users 
+        ON communities_users.community_id = communities.id
+      LEFT JOIN users 
+        ON communities_users.user_id = users.id
+      LEFT JOIN profiles 
+        ON profiles.user_id = users.id
+      WINDOW w_community AS (PARTITION BY communities.id); 
