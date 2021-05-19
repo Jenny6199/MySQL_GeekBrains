@@ -84,11 +84,13 @@ CREATE TABLE travel_log (
 -- ТАБЛИЦА № 7 Отзывы участников клуба
 DROP TABLE IF EXISTS messages;
 CREATE TABLE messages (
-	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	from_user_id INT UNSIGNED NOT NULL,
-	body VARCHAR(255) DEFAULT '---',
-	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Идентификатор записи', 
+	from_user_id INT UNSIGNED NOT NULL COMMENT 'Идентификатор пользователя',
+	travel_id INT UNSIGNED NOT NULL COMMENT 'id поездки',
+	body VARCHAR(255) DEFAULT '---' COMMENT 'Текст сообщения',
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Дата создания записи'
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Таблица отзывов';
+
 
 
 -- ТАБЛИЦА № 8 Клубные поездки
