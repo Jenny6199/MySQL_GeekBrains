@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS club_travels_list (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Идентификатор записи',
 	start_date DATETIME DEFAULT NULL COMMENT 'Дата начала поездки',
 	duration INT UNSIGNED COMMENT 'Продолжительность поездки',
-	specification VARCHAR(255) COMMENT 'Спецификация поездки',
+	specification ENUM ('professional', 'technical diving', 'continue education', 'specialization', 'recreation diving', 'freediving', 'beginner') COMMENT 'Спецификация поездки',
 	cost INT UNSIGNED DEFAULT NULL COMMENT 'Стоимость поездки',
 	travel_status INT UNSIGNED DEFAULT NULL COMMENT 'Статус поездки',
 	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Дата обновления'
