@@ -119,7 +119,8 @@ DROP TABLE IF EXISTS travel_requests;
 CREATE TABLE IF NOT EXISTS travel_requests (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Идентификатор заявки',
 	user_id INT UNSIGNED NOT NULL COMMENT 'Идентификатор пользователя',
-	payment INT UNSIGNED DEFAULT 0 COMMENT 'Статус оплаты',
+	request_to INT UNSIGNED COMMENT 'Идентификатор поездки',
+	payment ENUM('оплачено', 'ожидается оплата') COMMENT 'Статус оплаты',
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Таблица заявок';	
 
