@@ -44,6 +44,12 @@ ALTER TABLE qualification_of_members
 	ADD CONSTRAINT qual_inst_fk
 	FOREIGN KEY(instructor_id)
 	REFERENCES members(id);
+	
+-- Cоздание внешнего ключа для таблицы квалификации членов клуба по site_id
+ALTER TABLE qualification_of_members 
+	ADD CONSTRAINT qual_site_id_fk
+	FOREIGN KEY(site_id)
+	REFERENCES dive_sites(id);	
 
 -- Cоздание внешнего ключа для таблицы квалификации уровни квалификации
 ALTER TABLE qualification_of_members 
