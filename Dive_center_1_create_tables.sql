@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS qualification_of_members (
 	step_of_qualification INT UNSIGNED DEFAULT NULL COMMENT 'Идентификатор уровня квалификации',
 	instructor_id INT UNSIGNED NOT NULL COMMENT 'Идентификатор инструктора выдавшего сертификат',
 	created_at DATETIME NOT NULL COMMENT 'Дата присвоения квалификации',
-	site_id INT NOT NULL COMMENT 'Идентификатор филиала, где была присвоена квалификация'
+	site_id INT UNSIGNED NOT NULL COMMENT 'Идентификатор филиала, где была присвоена квалификация'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Сведения о квалификации членов клуба';
 
 
