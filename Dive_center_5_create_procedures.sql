@@ -53,5 +53,23 @@ BEGIN
 	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Пользователь уже есть в списке.';
 	END IF;
 END//
+
+							    
+-- ТРИГГЕР №2. Проверяет уровень квалификации пользователя перед обновлением
+-- нельзя устанавливать другой уровень, кроме следующего.
+CREATE TRIGGER check_qualification BEFORE UPDATE ON qualification_of_members 
+	FOR EACH ROW
+	BEGIN
+		DECLARE current_step INT;
+		SET @current_step = (SELECT DISTINCT 
+					MAX(OLD.step_of_qualification) OVER(PARTITION BY OLD.user_id)
+					FROM qualification_of_members AS qom
+					WHERE user_id = NEW.user_id);
+		IF NEW.step_of_qualification != (@current_step + 1)
+		THEN 
+			SIGNAL SQLSTATE '45000' 
+			SET MESSAGE_TEXT = 'Необходимо освоить предыдущие уровни квалификации';
+		END IF;
+	END//
 							    
 DELIMITER ;
