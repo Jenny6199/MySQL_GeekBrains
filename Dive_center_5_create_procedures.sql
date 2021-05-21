@@ -1,7 +1,7 @@
 -- ПРОЕКТ: Дайвинг-центр.
 -- Максим Сапунов Jenny6199@yandex.ru
 -- Файл №5
--- Создание хранимых процедур
+-- СОЗДАНИЕ ХРАНИМЫХ ПРОЦЕДУР И ТРИГГЕРОВ
 
 DELIMITER //
 
@@ -39,4 +39,19 @@ BEGIN
 	WHERE user_id = @i;
 END//
 
+
+-- ТРИГГЕР №1. Проверка имени пользователя перед внесением в таблицу members.
+CREATE TRIGGER check_members_unique_name BEFORE INSERT ON members
+FOR EACH ROW
+BEGIN
+	DECLARE chek_first_name INT;
+	DECLARE chek_last_name INT;
+	SET @check_first_name = (SELECT NEW.first_name IN(SELECT members.first_name FROM members));
+	SET	@check_last_name = (SELECT NEW.last_name IN(SELECT members.last_name FROM members));
+	IF @check_first_name = 1 AND
+		@check_last_name = 1 THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Пользователь уже есть в списке.';
+	END IF;
+END//
+							    
 DELIMITER ;
