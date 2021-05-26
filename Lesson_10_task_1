@@ -1,0 +1,52 @@
+-- Домашнее задание к уроку № 10 MySQL
+-- Студент Максим Сапунов Jenny6199@yandex.ru 13.05.2021
+
+-- Задача № 1 Проанализировать какие запросы могут выполняться наиболее 
+-- часто в процессе работы приложения и добавить необходимые индексы.
+
+USE vk;
+SHOW TABLES;
+
+DESC users;
+-- Создаю индекс на фамилию и имя пользователя в таблице users
+CREATE INDEX usr_1_and_2_name_idx ON users(last_name, first_name);
+
+DESC profiles;
+-- Создаю индексы на страну и город пользователя в таблице profiles
+CREATE INDEX prof_cntr_idx ON profiles(country);
+CREATE INDEX prof_city_idx ON profiles(city);
+
+DESC friendship;
+-- Создаю индекс на статус дружбы в таблице friendship
+CREATE INDEX frnd_stat_idx ON friendship(friendship_status_id);
+
+DESC friendship_statuses;
+-- Здесь создание дополнительных индексов не требуется
+
+DESC communities;
+SHOW CREATE TABLE communities;
+-- Создаю индекс на имя группы в таблице communities
+CREATE INDEX cmnt_name_idx ON communities(name);
+
+DESC communities_users;
+-- Здесь создание дополнительных индексов не требуется
+
+DESC likes;
+-- Здесь создание дополнительных индексов не требуется
+
+DESC media;
+-- Создаю индекс на тип медиа файлов в таблице медиа.
+CREATE INDEX media_mt_id_idx ON media(media_type_id);
+
+DESC messages;
+-- Здесь создание дополнительных индексов не требуется
+-- (имеются внешние ключи на user_id)
+
+DESC posts;
+-- имеются ранее созданные внешние ключи на user_id и community_id
+CREATE INDEX post_media_id_idx ON posts(media_id);
+
+
+-- Для удаления внешних ключей и индексов можно использовать:
+-- DROP INDEX post_media_id_idx ON posts;
+-- ALTER TABLE posts DROP FOREIGN KEY posts_user_id_fk;
