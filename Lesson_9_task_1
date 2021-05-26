@@ -1,0 +1,30 @@
+-- Домашнее задание к уроку № 9 MySQL.
+-- Студент: Максим Сапунов Jenny6199@yandex.ru 08.05.2021
+
+-- Задача № 1 В базе данных shop и sample присутствуют одни и те же
+-- таблицы учебной базы данных. Переместите запись id = 1 из таблицы
+-- shop.users в таблицу sample.users используя транзации. 
+
+-- Решение--------------------
+
+SELECT * FROM shop.users;
+SELECT * FROM sample.users;
+
+START TRANSACTION;
+-- Cоздаю переменную в которой сохраняю количество строк в исходной таблице
+	SET @row_count_1 := (SELECT COUNT(name) FROM shop.users);
+	SELECT CONCAT('В данной таблице всего ', @row_count, ' строк.') AS 'Info';
+-- Создаю точку сохранения перед добавлением данных в sample.users
+	SAVEPOINT after_insert; 
+-- Добавляю строку в таблицу базы данных sample.users 
+	INSERT INTO sample.users (SELECT * FROM shop.users WHERE users.id = 1);
+	SET @row_count_2 := (SELECT COUNT(name) FROM sample.users);
+	SELECT CONCAT('Перенесено ', @row_count_2, ' строк из ', @row_count_1, '.') AS 'Info';
+-- Создаю точку сохранения транзакции
+	SAVEPOINT before_delete;
+-- Удаляю данные из таблицы БД shop
+	DELETE FROM shop.users WHERE users.id = 1;
+-- Возможные варианты:
+-- ROLLBACK TO SAVEPOINT after_insert;
+-- ROLLBACK TO SAVEPOINT before_delete;
+COMMIT;
